@@ -33,16 +33,17 @@
         font-family: Arial, sans-serif;
         width: auto;
     }
-    .linha-editavel {
-        display: block;
-        width: 100%;
-    }
     .linha-editavel input {
         width: 90%;
     }
-    .data {
-        display: inline-block;
-        width: auto;
+    .data-container {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        margin-top:5px;
+    }
+    .assinatura-nome {
+        margin-top:10px;
     }
 </style>
 </head>
@@ -56,7 +57,7 @@
 <p>&nbsp;</p>
 
 <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
-<input type="number" id="valor" placeholder="0,00"></p>
+<input type="number" id="valor" placeholder="0,00" min="0"></p>
 
 <p id="valorExtenso" style="margin-left:10px;"></p>
 
@@ -72,7 +73,28 @@
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
-<p>Urubici, <input type="text" id="data" style="width:120px;"></p>
+<div class="data-container">
+    Urubici, 
+    <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
+    <select id="mes">
+        <option value="janeiro">Janeiro</option>
+        <option value="fevereiro">Fevereiro</option>
+        <option value="março">Março</option>
+        <option value="abril">Abril</option>
+        <option value="maio">Maio</option>
+        <option value="junho">Junho</option>
+        <option value="julho">Julho</option>
+        <option value="agosto">Agosto</option>
+        <option value="setembro">Setembro</option>
+        <option value="outubro">Outubro</option>
+        <option value="novembro">Novembro</option>
+        <option value="dezembro">Dezembro</option>
+    </select>
+    <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
+</div>
+
+<p class="assinatura-nome"><input type="text" id="assinatura" placeholder="Nome completo"></p>
+
 </div>
 
 <div style="text-align:center; margin-top:10px;">
@@ -80,53 +102,75 @@
 </div>
 
 <script>
-// Função para converter número para extenso em português
-function numeroParaExtenso(valor) {
-    const unidades = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
-    const dezenas = ["","dez","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
-    const especiais = ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"];
+// Função para converter número em extenso (até milhões)
+function numeroParaExtenso(valor){
+    const numeros = {
+        unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
+        especiais: ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"],
+        dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
+        centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
+    };
 
     valor = parseInt(valor);
     if(isNaN(valor)) return "";
 
-    if(valor < 10) return unidades[valor];
-    if(valor < 20) return especiais[valor-10];
-    if(valor < 100) {
-        let u = valor % 10;
-        let d = Math.floor(valor / 10);
-        return dezenas[d] + (u>0 ? " e " + unidades[u] : "");
+    if(valor === 0) return "zero";
+    if(valor === 100) return "cem";
+
+    let extenso = "";
+
+    if(valor >= 1000){
+        let milhares = Math.floor(valor/1000);
+        extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
+        valor %= 1000;
+        if(valor>0) extenso += " e ";
     }
-    if(valor < 1000){
+
+    if(valor >= 100){
         let c = Math.floor(valor/100);
-        let resto = valor % 100;
-        let str = "";
-        if(c==1 && resto==0) str = "cem";
-        else str = (c>0 ? unidades[c]+"centos" : "");
-        if(resto>0) str += " e " + numeroParaExtenso(resto);
-        return str;
+        extenso += numeros.centenas[c];
+        valor %= 100;
+        if(valor>0) extenso += " e ";
     }
-    return valor; // acima de 999, retorna número
+
+    if(valor >= 20){
+        let d = Math.floor(valor/10);
+        extenso += numeros.dezenas[d];
+        valor %= 10;
+        if(valor>0) extenso += " e ";
+    }
+
+    if(valor >=10 && valor <20){
+        extenso += numeros.especiais[valor-10];
+        valor=0;
+    }
+
+    if(valor>0 && valor<10){
+        extenso += numeros.unidades[valor];
+    }
+
+    return extenso;
 }
 
-// Atualiza o valor por extenso automaticamente
+// Atualiza valor por extenso automaticamente
 document.getElementById("valor").addEventListener("input", function(){
     const valor = this.value;
     document.getElementById("valorExtenso").innerText = numeroParaExtenso(valor) + " reais";
 });
 
-// Define data atual como padrão
+// Coloca data atual
 const hoje = new Date();
-const dia = String(hoje.getDate()).padStart(2,'0');
-const mes = String(hoje.getMonth()+1).padStart(2,'0');
-const ano = hoje.getFullYear();
-document.getElementById("data").value = `${dia}/${mes}/${ano}`;
+document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
+document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
+document.getElementById("ano").value = hoje.getFullYear();
 
-// PDF
+// Gerar PDF
 document.getElementById("btnPDF").addEventListener("click", function(){
     const reciboDiv = document.querySelector(".recibo");
+    
+    // Substitui inputs por span temporariamente
     const clone = reciboDiv.cloneNode(true);
-
-    clone.querySelectorAll("input").forEach(function(el){
+    clone.querySelectorAll("input, select").forEach(function(el){
         const span = document.createElement("span");
         span.textContent = el.value || el.placeholder;
         el.parentNode.replaceChild(span, el);
