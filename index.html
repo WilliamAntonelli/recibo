@@ -8,7 +8,7 @@
     body {
         font-family: Arial, sans-serif;
         margin: 20px auto;
-        width: 50%; /* meia página */
+        width: 50%;
         background-color: #fff;
     }
     .recibo {
@@ -60,7 +60,7 @@
 <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
 <input type="number" id="valor" placeholder="0,00" min="0"></p>
 
-<p id="valorExtenso" style="margin-left:10px;"></p>
+<p id="valorExtenso" style="margin-left:10px;">( )</p>
 
 <p>Da <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
@@ -156,7 +156,7 @@ function numeroParaExtenso(valor){
 // Atualiza valor por extenso automaticamente
 document.getElementById("valor").addEventListener("input", function(){
     const valor = this.value;
-    document.getElementById("valorExtenso").innerText = numeroParaExtenso(valor) + " reais";
+    document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
 });
 
 // Coloca data atual
@@ -165,31 +165,41 @@ document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
 document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
 document.getElementById("ano").value = hoje.getFullYear();
 
-// Contador de arquivos PDF
-let contadorPDF = 1;
-
 // Gerar PDF
 document.getElementById("btnPDF").addEventListener("click", function(){
     const reciboDiv = document.querySelector(".recibo");
-    
-    // Substitui inputs por span temporariamente
-    const clone = reciboDiv.cloneNode(true);
-    clone.querySelectorAll("input, select").forEach(function(el){
+
+    // Substitui inputs temporariamente por spans
+    const inputs = reciboDiv.querySelectorAll("input, select");
+    const backup = [];
+    inputs.forEach(el=>{
         const span = document.createElement("span");
         span.textContent = el.value || el.placeholder;
+        backup.push({parent: el.parentNode, el: el, next: el.nextSibling});
         el.parentNode.replaceChild(span, el);
     });
 
-    // Gera PDF com nome único
-    html2pdf(clone, {
+    // Cria nome do arquivo com data e hora
+    const dataHora = new Date();
+    const ano = dataHora.getFullYear();
+    const mes = String(dataHora.getMonth()+1).padStart(2,'0');
+    const dia = String(dataHora.getDate()).padStart(2,'0');
+    const hora = String(dataHora.getHours()).padStart(2,'0');
+    const min = String(dataHora.getMinutes()).padStart(2,'0');
+    const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
+
+    html2pdf(reciboDiv, {
         margin: 0.5,
-        filename: `recibo-${contadorPDF}.pdf`,
+        filename: nomeArquivo,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{scale:2},
         jsPDF:{unit:'in', format:'a4', orientation:'portrait'}
+    }).then(()=>{
+        // Restaura inputs
+        backup.forEach(b=>{
+            b.parent.insertBefore(b.el, b.next);
+        });
     });
-
-    contadorPDF++; // incrementa para próximo PDF
 });
 </script>
 
