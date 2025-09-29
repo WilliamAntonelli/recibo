@@ -44,6 +44,7 @@
     }
     .assinatura-nome {
         margin-top:10px;
+        font-weight:bold;
     }
 </style>
 </head>
@@ -93,7 +94,7 @@
     <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
 </div>
 
-<p class="assinatura-nome"><input type="text" id="assinatura" placeholder="Nome completo"></p>
+<p class="assinatura-nome">Flavia Aparecida de Souza</p>
 
 </div>
 
@@ -164,6 +165,9 @@ document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
 document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
 document.getElementById("ano").value = hoje.getFullYear();
 
+// Contador de arquivos PDF
+let contadorPDF = 1;
+
 // Gerar PDF
 document.getElementById("btnPDF").addEventListener("click", function(){
     const reciboDiv = document.querySelector(".recibo");
@@ -176,13 +180,16 @@ document.getElementById("btnPDF").addEventListener("click", function(){
         el.parentNode.replaceChild(span, el);
     });
 
+    // Gera PDF com nome único
     html2pdf(clone, {
         margin: 0.5,
-        filename: 'recibo.pdf',
+        filename: `recibo-${contadorPDF}.pdf`,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{scale:2},
         jsPDF:{unit:'in', format:'a4', orientation:'portrait'}
     });
+
+    contadorPDF++; // incrementa para próximo PDF
 });
 </script>
 
