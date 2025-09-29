@@ -8,34 +8,45 @@
     body {
         font-family: Arial, sans-serif;
         margin: 20px;
+        background-color: #f9f9f9;
     }
     .recibo {
+        background: #fff;
         border: 2px solid #333;
-        padding: 20px;
-        max-width: 700px;
+        border-radius: 8px;
+        padding: 30px 25px;
+        max-width: 720px;
         margin: 0 auto;
         line-height: 1.6;
         white-space: pre-wrap;
         word-wrap: break-word;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     h1 {
         text-align: center;
-        font-size: 1.5em;
+        font-size: 1.8em;
+        margin-bottom: 20px;
     }
     p {
-        margin: 10px 0;
+        margin: 12px 0;
+        font-size: 1.1em;
     }
-    input, textarea {
+    input, select {
         border: none;
         border-bottom: 1px solid #000;
         font-size: 1em;
-        width: 100%;
         padding: 2px 5px;
         font-family: Arial, sans-serif;
+        min-width: 50px;
         box-sizing: border-box;
     }
-    textarea {
-        resize: vertical;
+    .linha {
+        margin-bottom: 10px;
+    }
+    .data-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
     }
     .assinatura {
         text-align: right;
@@ -47,15 +58,21 @@
         margin-top: 20px;
     }
     button {
-        padding: 10px 15px;
+        padding: 10px 20px;
         font-size: 1em;
         cursor: pointer;
+        border: none;
+        background: #333;
+        color: #fff;
+        border-radius: 5px;
     }
-    /* Responsivo */
     @media (max-width: 768px) {
         .recibo {
             width: 95%;
-            padding: 15px;
+            padding: 20px;
+        }
+        .data-container {
+            flex-wrap: wrap;
         }
     }
 </style>
@@ -65,19 +82,49 @@
 <h1>RECIBO</h1>
 
 <div id="recibo" class="recibo">
-<p><strong>Sabor da Roça</strong></p>
-<p>CNPJ: <input type="text" id="cnpj" value="58.81.685/0001-82"></p>
+    <p><strong>Sabor da Roça</strong></p>
+    <p>CNPJ: <input type="text" id="cnpj" value="58.81.685/0001-82"></p>
 
-<p>Eu, <input type="text" id="recebedor" placeholder="Nome completo do recebedor" value="Flavia Aparecida de Souza">, recebi a quantia de R$ 
-<input type="text" id="valor" placeholder="Valor" value="980,00"> (<input type="text" id="valorExtenso" placeholder="Valor por extenso" value="novecentos e oitenta reais">), da 
-<input type="text" id="pagador" placeholder="Nome do pagador" value="Paróquia Nossa Senhora Mãe dos Homens">, referente à 
-<input type="text" id="motivo" placeholder="Motivo do pagamento" value="venda de bolos">.</p>
+    <div class="linha">
+        Eu, <input type="text" id="recebedor" placeholder="Nome completo" value="Flavia Aparecida de Souza">, 
+        recebi a quantia de R$ <input type="text" id="valor" value="980,00">
+    </div>
 
-<p>Por ser verdade, firmamos o presente recibo para os devidos fins,</p>
+    <div class="linha">
+        (<input type="text" id="valorExtenso" value="novecentos e oitenta reais">)
+    </div>
 
-<p><input type="text" id="cidade" placeholder="Cidade" value="Urubici">, <input type="text" id="data" placeholder="Data"></p>
+    <div class="linha">
+        Da <input type="text" id="pagador" value="Paróquia Nossa Senhora Mãe dos Homens">
+    </div>
 
-<p class="assinatura"><input type="text" id="assinatura" placeholder="Assinatura" value="Flavia Aparecida de Souza"></p>
+    <div class="linha">
+        Referente à <input type="text" id="motivo" value="venda de bolos">
+    </div>
+
+    <div class="linha data-container">
+        <span><input type="number" id="dia" min="1" max="31" placeholder="DD" style="width:60px;"></span>
+        <span>
+            <select id="mes">
+                <option value="janeiro">Janeiro</option>
+                <option value="fevereiro">Fevereiro</option>
+                <option value="março">Março</option>
+                <option value="abril">Abril</option>
+                <option value="maio">Maio</option>
+                <option value="junho">Junho</option>
+                <option value="julho">Julho</option>
+                <option value="agosto">Agosto</option>
+                <option value="setembro">Setembro</option>
+                <option value="outubro">Outubro</option>
+                <option value="novembro">Novembro</option>
+                <option value="dezembro">Dezembro</option>
+            </select>
+        </span>
+        <span><input type="number" id="ano" min="2000" max="2100" placeholder="AAAA" style="width:80px;"></span>
+        <span>&nbsp;&nbsp; em <input type="text" id="cidade" value="Urubici"></span>
+    </div>
+
+    <p class="assinatura"><input type="text" id="assinatura" value="Flavia Aparecida de Souza"></p>
 </div>
 
 <div class="btn-container">
@@ -85,30 +132,11 @@
 </div>
 
 <script>
-// Função para criar data no formato: dia, mês por extenso, ano
-function formatarData() {
-    const dataInput = prompt("Digite a data no formato DD/MM/AAAA:");
-    if (!dataInput) return "";
-    const partes = dataInput.split("/");
-    if (partes.length !== 3) return "";
-    const meses = ["janeiro","fevereiro","março","abril","maio","junho",
-                   "julho","agosto","setembro","outubro","novembro","dezembro"];
-    const dia = partes[0].padStart(2,"0");
-    const mes = meses[parseInt(partes[1],10)-1] || "";
-    const ano = partes[2];
-    return `${dia} de ${mes} de ${ano}`;
-}
-
-// Coloca a data automaticamente quando o campo é clicado
-document.getElementById("data").addEventListener("focus", function() {
-    this.value = formatarData();
-});
-
 document.getElementById("btnPDF").addEventListener("click", function () {
     const reciboDiv = document.getElementById("recibo");
     const clone = reciboDiv.cloneNode(true);
 
-    clone.querySelectorAll("input, textarea").forEach(function(el){
+    clone.querySelectorAll("input, select").forEach(function(el){
         const span = document.createElement("span");
         span.textContent = el.value || el.placeholder;
         el.parentNode.replaceChild(span, el);
