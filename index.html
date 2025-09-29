@@ -7,147 +7,137 @@
 <style>
     body {
         font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: #f9f9f9;
+        margin: 20px auto;
+        width: 50%; /* meia página */
+        background-color: #fff;
     }
     .recibo {
-        background: #fff;
-        border: 2px solid #333;
-        border-radius: 8px;
-        padding: 30px 25px;
-        max-width: 720px;
-        margin: 0 auto;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border: 1px solid #333;
+        padding: 20px;
+        line-height: 1.5;
     }
     h1 {
         text-align: center;
-        font-size: 1.8em;
-        margin-bottom: 20px;
+        font-size: 1.5em;
+        margin-bottom: 5px;
     }
     p {
-        margin: 12px 0;
-        font-size: 1.1em;
+        margin: 5px 0;
+        font-size: 1em;
     }
-    input, select {
+    input {
         border: none;
         border-bottom: 1px solid #000;
         font-size: 1em;
-        padding: 2px 5px;
+        padding: 2px 3px;
         font-family: Arial, sans-serif;
-        min-width: 50px;
-        box-sizing: border-box;
+        width: auto;
     }
-    .linha {
-        margin-bottom: 10px;
+    .linha-editavel {
+        display: block;
+        width: 100%;
     }
-    .data-container {
-        display: flex;
-        gap: 10px;
-        align-items: center;
+    .linha-editavel input {
+        width: 90%;
     }
-    .assinatura {
-        text-align: right;
-        margin-top: 50px;
-        font-weight: bold;
-    }
-    .btn-container {
-        text-align: center;
-        margin-top: 20px;
-    }
-    button {
-        padding: 10px 20px;
-        font-size: 1em;
-        cursor: pointer;
-        border: none;
-        background: #333;
-        color: #fff;
-        border-radius: 5px;
-    }
-    @media (max-width: 768px) {
-        .recibo {
-            width: 95%;
-            padding: 20px;
-        }
-        .data-container {
-            flex-wrap: wrap;
-        }
+    .data {
+        display: inline-block;
+        width: auto;
     }
 </style>
 </head>
 <body>
 
-<h1>RECIBO</h1>
+<div class="recibo">
+<h1>Sabor da Roça</h1>
+<p>CNPJ: 58.81.685/0001-82</p>
 
-<div id="recibo" class="recibo">
-    <p><strong>Sabor da Roça</strong></p>
-    <p>CNPJ: <input type="text" id="cnpj" value="58.81.685/0001-82"></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 
-    <div class="linha">
-        Eu, <input type="text" id="recebedor" placeholder="Nome completo" value="Flavia Aparecida de Souza">, 
-        recebi a quantia de R$ <input type="text" id="valor" value="980,00">
-    </div>
+<p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+<input type="number" id="valor" placeholder="0,00"></p>
 
-    <div class="linha">
-        (<input type="text" id="valorExtenso" value="novecentos e oitenta reais">)
-    </div>
+<p id="valorExtenso" style="margin-left:10px;"></p>
 
-    <div class="linha">
-        Da <input type="text" id="pagador" value="Paróquia Nossa Senhora Mãe dos Homens">
-    </div>
+<p>Da <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
-    <div class="linha">
-        Referente à <input type="text" id="motivo" value="venda de bolos">
-    </div>
+<p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-    <div class="linha data-container">
-        <span><input type="number" id="dia" min="1" max="31" placeholder="DD" style="width:60px;"></span>
-        <span>
-            <select id="mes">
-                <option value="janeiro">Janeiro</option>
-                <option value="fevereiro">Fevereiro</option>
-                <option value="março">Março</option>
-                <option value="abril">Abril</option>
-                <option value="maio">Maio</option>
-                <option value="junho">Junho</option>
-                <option value="julho">Julho</option>
-                <option value="agosto">Agosto</option>
-                <option value="setembro">Setembro</option>
-                <option value="outubro">Outubro</option>
-                <option value="novembro">Novembro</option>
-                <option value="dezembro">Dezembro</option>
-            </select>
-        </span>
-        <span><input type="number" id="ano" min="2000" max="2100" placeholder="AAAA" style="width:80px;"></span>
-        <span>&nbsp;&nbsp; em <input type="text" id="cidade" value="Urubici"></span>
-    </div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 
-    <p class="assinatura"><input type="text" id="assinatura" value="Flavia Aparecida de Souza"></p>
+<p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p>Urubici, <input type="text" id="data" style="width:120px;"></p>
 </div>
 
-<div class="btn-container">
-    <button id="btnPDF">📄 Gerar PDF</button>
+<div style="text-align:center; margin-top:10px;">
+<button id="btnPDF">📄 Gerar PDF</button>
 </div>
 
 <script>
-document.getElementById("btnPDF").addEventListener("click", function () {
-    const reciboDiv = document.getElementById("recibo");
+// Função para converter número para extenso em português
+function numeroParaExtenso(valor) {
+    const unidades = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
+    const dezenas = ["","dez","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
+    const especiais = ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"];
+
+    valor = parseInt(valor);
+    if(isNaN(valor)) return "";
+
+    if(valor < 10) return unidades[valor];
+    if(valor < 20) return especiais[valor-10];
+    if(valor < 100) {
+        let u = valor % 10;
+        let d = Math.floor(valor / 10);
+        return dezenas[d] + (u>0 ? " e " + unidades[u] : "");
+    }
+    if(valor < 1000){
+        let c = Math.floor(valor/100);
+        let resto = valor % 100;
+        let str = "";
+        if(c==1 && resto==0) str = "cem";
+        else str = (c>0 ? unidades[c]+"centos" : "");
+        if(resto>0) str += " e " + numeroParaExtenso(resto);
+        return str;
+    }
+    return valor; // acima de 999, retorna número
+}
+
+// Atualiza o valor por extenso automaticamente
+document.getElementById("valor").addEventListener("input", function(){
+    const valor = this.value;
+    document.getElementById("valorExtenso").innerText = numeroParaExtenso(valor) + " reais";
+});
+
+// Define data atual como padrão
+const hoje = new Date();
+const dia = String(hoje.getDate()).padStart(2,'0');
+const mes = String(hoje.getMonth()+1).padStart(2,'0');
+const ano = hoje.getFullYear();
+document.getElementById("data").value = `${dia}/${mes}/${ano}`;
+
+// PDF
+document.getElementById("btnPDF").addEventListener("click", function(){
+    const reciboDiv = document.querySelector(".recibo");
     const clone = reciboDiv.cloneNode(true);
 
-    clone.querySelectorAll("input, select").forEach(function(el){
+    clone.querySelectorAll("input").forEach(function(el){
         const span = document.createElement("span");
         span.textContent = el.value || el.placeholder;
         el.parentNode.replaceChild(span, el);
     });
 
     html2pdf(clone, {
-        margin:       0.5,
-        filename:     'recibo.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        margin: 0.5,
+        filename: 'recibo.pdf',
+        image: { type:'jpeg', quality:0.98 },
+        html2canvas:{scale:2},
+        jsPDF:{unit:'in', format:'a4', orientation:'portrait'}
     });
 });
 </script>
