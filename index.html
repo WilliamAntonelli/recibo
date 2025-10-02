@@ -13,16 +13,16 @@
         justify-content: center;
         flex-direction: column;
         align-items: center;
-        padding: 10px; /* margem da tela */
     }
     .recibo {
         border: 1px solid #333;
-        padding: 2cm; /* padding interno de 2cm */
+        padding: 2cm;           /* 2cm de margem interna */
         line-height: 1.5;
         background: white;
-        width: 100%;
-        max-width: 800px; /* limita a largura em telas grandes */
+        width: 800px;           /* largura fixa */
+        min-height: 1120px;     /* altura aproximada de A4 */
         box-sizing: border-box;
+        margin-bottom: 30px;
     }
     h1 {
         text-align: center;
@@ -30,7 +30,7 @@
         margin-bottom: 5px;
     }
     p {
-        margin: 5px 0;
+        margin: 0; /* reset básico, vamos controlar por parágrafo */
         font-size: 1em;
     }
     input {
@@ -40,88 +40,76 @@
         padding: 2px 3px;
         font-family: Arial, sans-serif;
         width: auto;
-        max-width: 100%;
+    }
+    .linha-editavel input {
+        width: 90%;
     }
     .data-container {
         display: flex;
         gap: 5px;
         align-items: center;
-        margin-top: 5px;
+        margin-top:2em; /* 2 linhas antes de Urubici */
     }
     .assinatura-nome {
-        margin-top: 3em; /* cerca de 3 linhas de espaço */
         font-weight: bold;
-        margin-bottom: 1em;
+        margin-top: 0; /* assinatura colada em Urubici */
     }
     #btnPDF {
         padding: 8px 16px;
         font-size: 1em;
         cursor: pointer;
         margin-top: 10px;
-        text-align: center;
-    }
-    /* Ajustes para telas pequenas */
-    @media (max-width: 500px) {
-        .recibo {
-            padding: 1.5cm; /* reduz padding em celulares */
-        }
-        .data-container {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 3px;
-        }
-        .data-container input, .data-container select {
-            width: 100%;
-        }
     }
 </style>
 </head>
 <body>
 
 <div class="recibo" id="recibo">
-    <h1>Sabor da Roça</h1>
-    <p>CNPJ: 58.81.685/0001-82</p>
+<h1>Sabor da Roça</h1>
 
-    <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
-    <input type="number" id="valor" placeholder="0,00" min="0"></p>
+<p style="margin-top:1em;">CNPJ: 58.81.685/0001-82</p>
 
-    <p id="valorExtenso" style="margin-left:10px;">( )</p>
+<p style="margin-top:1em;">Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+<input type="number" id="valor" placeholder="0,00" min="0"></p>
 
-    <p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+<p id="valorExtenso" style="margin-left:10px; margin-top:0.2em;">( )</p>
 
-    <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
+<p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
-    <p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+<p style="margin-top:1em;">Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-    <div class="data-container">
-        Urubici, 
-        <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
-        <select id="mes">
-            <option value="janeiro">Janeiro</option>
-            <option value="fevereiro">Fevereiro</option>
-            <option value="março">Março</option>
-            <option value="abril">Abril</option>
-            <option value="maio">Maio</option>
-            <option value="junho">Junho</option>
-            <option value="julho">Julho</option>
-            <option value="agosto">Agosto</option>
-            <option value="setembro">Setembro</option>
-            <option value="outubro">Outubro</option>
-            <option value="novembro">Novembro</option>
-            <option value="dezembro">Dezembro</option>
-        </select>
-        <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
-    </div>
+<p style="margin-top:1em;">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
 
-    <p class="assinatura-nome">Flavia Aparecida de Souza</p>
+<div class="data-container">
+    Urubici, 
+    <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
+    <select id="mes">
+        <option value="janeiro">Janeiro</option>
+        <option value="fevereiro">Fevereiro</option>
+        <option value="março">Março</option>
+        <option value="abril">Abril</option>
+        <option value="maio">Maio</option>
+        <option value="junho">Junho</option>
+        <option value="julho">Julho</option>
+        <option value="agosto">Agosto</option>
+        <option value="setembro">Setembro</option>
+        <option value="outubro">Outubro</option>
+        <option value="novembro">Novembro</option>
+        <option value="dezembro">Dezembro</option>
+    </select>
+    <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
+</div>
+
+<p class="assinatura-nome">Flavia Aparecida de Souza</p>
+
 </div>
 
 <div style="text-align:center;">
-    <button id="btnPDF">📄 Gerar PDF</button>
+<button id="btnPDF">📄 Gerar PDF</button>
 </div>
 
 <script>
-// Função para converter número em extenso (até milhões)
+// Função para converter número em extenso
 function numeroParaExtenso(valor){
     const numeros = {
         unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
@@ -132,7 +120,6 @@ function numeroParaExtenso(valor){
 
     valor = parseInt(valor);
     if(isNaN(valor)) return "";
-
     if(valor === 0) return "zero";
     if(valor === 100) return "cem";
 
@@ -197,7 +184,7 @@ document.getElementById("btnPDF").addEventListener("click", function(){
         el.parentNode.replaceChild(span, el);
     });
 
-    // Cria nome do arquivo com data e hora
+    // Nome do arquivo
     const dataHora = new Date();
     const ano = dataHora.getFullYear();
     const mes = String(dataHora.getMonth()+1).padStart(2,'0');
@@ -207,11 +194,11 @@ document.getElementById("btnPDF").addEventListener("click", function(){
     const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
 
     html2pdf().set({
-        margin: 2, // 2cm no PDF
+        margin: 20, /* 2cm em mm */
         filename: nomeArquivo,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{ scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-        jsPDF:{ unit:'cm', format:'a4', orientation:'portrait' }
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
     }).from(reciboDiv).save().then(()=>{
         // Restaura inputs
         backup.forEach(b=>{
