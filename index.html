@@ -11,19 +11,18 @@
         padding: 20px;
         background-color: #f5f5f5;
         display: flex;
-        justify-content: center;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: center;
     }
     .recibo {
         border: 1px solid #333;
-        padding: 20px;
+        padding: 2cm; /* margem interna de 2cm */
         line-height: 1.5;
         background: white;
         width: 100%;
         max-width: 800px;
-        min-height: 1120px; /* altura próxima de A4 */
+        min-height: 29.7cm; /* altura A4 para PDF */
         box-sizing: border-box;
-        margin-bottom: 20px; /* espaço entre recibo e botão */
     }
     h1 {
         text-align: center;
@@ -34,7 +33,7 @@
         margin: 5px 0;
         font-size: 1em;
     }
-    input {
+    input, select {
         border: none;
         border-bottom: 1px solid #000;
         font-size: 1em;
@@ -53,19 +52,20 @@
         flex-wrap: wrap;
     }
     .assinatura-nome {
-        margin-top: 10px;
+        margin-top: 1em; /* 2 linhas de espaço */
         font-weight: bold;
-        margin-bottom: 20px; /* apenas 2 linhas */
+        margin-bottom: 1em; /* 2 linhas de espaço */
     }
     #btnPDF {
         padding: 8px 16px;
         font-size: 1em;
         cursor: pointer;
+        margin-top: 10px;
     }
     /* Responsividade */
     @media (max-width: 600px) {
         .recibo {
-            padding: 15px;
+            padding: 1.5cm;
         }
         input, select {
             width: 100%;
@@ -84,26 +84,17 @@
     <h1>Sabor da Roça</h1>
     <p>CNPJ: 58.81.685/0001-82</p>
 
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-
     <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
         <input type="number" id="valor" placeholder="0,00" min="0">
     </p>
 
-    <p id="valorExtenso" style="margin-left:10px;">( )</p>
+    <p id="valorExtenso">( )</p>
 
     <p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
     <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
-
     <p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
-
-    <p>&nbsp;</p>
-    <p>&nbsp;</p>
 
     <div class="data-container">
         Urubici, 
@@ -128,7 +119,7 @@
     <p class="assinatura-nome">Flavia Aparecida de Souza</p>
 </div>
 
-<div style="text-align:center; margin-top:10px;">
+<div style="text-align:center;">
     <button id="btnPDF">📄 Gerar PDF</button>
 </div>
 
@@ -141,14 +132,11 @@ function numeroParaExtenso(valor){
         dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
         centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
     };
-
     valor = parseInt(valor);
     if(isNaN(valor)) return "";
     if(valor === 0) return "zero";
     if(valor === 100) return "cem";
-
     let extenso = "";
-
     if(valor >= 1000){
         let milhares = Math.floor(valor/1000);
         extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
@@ -211,7 +199,7 @@ document.getElementById("btnPDF").addEventListener("click", function(){
     const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
 
     html2pdf().set({
-        margin: [10,10,10,10], // margem segura para qualquer tela
+        margin: 20, // 2cm
         filename: nomeArquivo,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{ scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
