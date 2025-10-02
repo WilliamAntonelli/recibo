@@ -45,66 +45,148 @@
         font-family: Arial, sans-serif;
         width: auto;
     }
-    .assinatura {
-        margin-top: 3em; /* espaço fixo até assinatura */
-        text-align: left;
-    }
-    .assinatura p {
-        margin: 0.3em 0;
-    }
-    .rodape {
-        position: absolute;
-        bottom: 2cm; /* garante espaço fixo da margem inferior */
-        left: 2cm;
-        right: 2cm;
-    }
+    .espaco-1linha { margin-top: 1em; }
+    .espaco-2linhas { margin-top: 2em; }
+    .data-container { display: flex; gap: 5px; align-items: center; margin-top: 2em; }
+    .assinatura-nome { font-weight: bold; margin-top: 0; text-align: left; }
 </style>
 </head>
 <body>
-    <div class="recibo" id="recibo">
-        <h1>RECIBO</h1>
-        <p>Recebi de <input type="text" placeholder="Nome do cliente">, CPF <input type="text" placeholder="CPF">, a quantia de R$ <input type="text" placeholder="Valor">, referente a <input type="text" placeholder="Motivo">.</p>
-        
-        <br><br> <!-- +2 linhas entre CNPJ e Flavia -->
-        <p>CNPJ: 00.000.000/0000-00</p>
-        <br><br> 
-        <p>Eu, Flavia..., responsável pelo Sabor da Roça, declaro que recebi o valor acima descrito.</p>
-        
-        <br><br> <!-- +2 linhas entre Motivo e Por ser verdade -->
-        <p>Por ser verdade, firmo o presente recibo.</p>
 
-        <br><br> <!-- +2 linhas entre Por ser verdade e Urubici -->
-        <p>Urubici, ____/____/______</p>
+<div class="recibo" id="recibo">
+    <h1>Sabor da Roça</h1>
 
-        <div class="assinatura">
-            <p>___________________________________</p>
-            <p>Flavia...</p>
-        </div>
+    <p>CNPJ: 58.81.685/0001-82</p>
+    <br> <!-- linha extra -->
+    
+    <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+    <input type="number" id="valor" placeholder="0,00" min="0"></p>
 
-        <div class="rodape">
-            <p style="text-align: left; font-size: 0.8em;">
-                Arquivo gerado em: <span id="dataHora"></span>
-            </p>
-        </div>
+    <p id="valorExtenso" style="margin-left:10px;">( )</p>
+
+    <p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+
+    <p class="espaco-1linha">Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
+
+    <p class="espaco-1linha">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+
+    <div class="data-container espaco-1linha">
+        Urubici, 
+        <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
+        <select id="mes">
+            <option value="janeiro">Janeiro</option>
+            <option value="fevereiro">Fevereiro</option>
+            <option value="março">Março</option>
+            <option value="abril">Abril</option>
+            <option value="maio">Maio</option>
+            <option value="junho">Junho</option>
+            <option value="julho">Julho</option>
+            <option value="agosto">Agosto</option>
+            <option value="setembro">Setembro</option>
+            <option value="outubro">Outubro</option>
+            <option value="novembro">Novembro</option>
+            <option value="dezembro">Dezembro</option>
+        </select>
+        de <input type="number" id="ano" placeholder="AAAA" style="width:70px;">
     </div>
 
-    <button onclick="gerarPDF()">Gerar PDF</button>
+    <p class="assinatura-nome" style="margin-top:120mm;">Flavia Aparecida de Souza</p>
+</div>
+
+<div style="text-align:center; margin-top:10px;">
+    <button id="btnPDF">📄 Gerar PDF</button>
+</div>
 
 <script>
-function gerarPDF() {
-    const element = document.getElementById('recibo');
-    const opt = {
-        margin: 0,
-        filename: new Date().toLocaleString().replace(/[\/, :]/g, '-') + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+// Função para converter número em extenso
+function numeroParaExtenso(valor){
+    const numeros = {
+        unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
+        especiais: ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"],
+        dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
+        centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
     };
-    html2pdf().set(opt).from(element).save();
+    valor = parseInt(valor);
+    if(isNaN(valor)) return "";
+    if(valor === 0) return "zero";
+    if(valor === 100) return "cem";
+
+    let extenso = "";
+
+    if(valor >= 1000){
+        let milhares = Math.floor(valor/1000);
+        extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
+        valor %= 1000;
+        if(valor>0) extenso += " e ";
+    }
+    if(valor >= 100){
+        let c = Math.floor(valor/100);
+        extenso += numeros.centenas[c];
+        valor %= 100;
+        if(valor>0) extenso += " e ";
+    }
+    if(valor >= 20){
+        let d = Math.floor(valor/10);
+        extenso += numeros.dezenas[d];
+        valor %= 10;
+        if(valor>0) extenso += " e ";
+    }
+    if(valor >=10 && valor <20){
+        extenso += numeros.especiais[valor-10];
+        valor=0;
+    }
+    if(valor>0 && valor<10){
+        extenso += numeros.unidades[valor];
+    }
+    return extenso;
 }
 
-// mostrar data/hora no rodapé
-document.getElementById("dataHora").textContent = new Date().toLocaleString();
+// Atualiza valor por extenso automaticamente
+document.getElementById("valor").addEventListener("input", function(){
+    const valor = this.value;
+    document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
+});
+
+// Coloca data atual
+const hoje = new Date();
+document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
+document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
+document.getElementById("ano").value = hoje.getFullYear();
+
+// Gerar PDF
+document.getElementById("btnPDF").addEventListener("click", function(){
+    const reciboDiv = document.getElementById("recibo");
+
+    const inputs = reciboDiv.querySelectorAll("input, select");
+    const backup = [];
+    inputs.forEach(el=>{
+        const span = document.createElement("span");
+        span.textContent = el.value || el.placeholder;
+        backup.push({parent: el.parentNode, el: el, next: el.nextSibling});
+        el.parentNode.replaceChild(span, el);
+    });
+
+    const dataHora = new Date();
+    const ano = dataHora.getFullYear();
+    const mes = String(dataHora.getMonth()+1).padStart(2,'0');
+    const dia = String(dataHora.getDate()).padStart(2,'0');
+    const hora = String(dataHora.getHours()).padStart(2,'0');
+    const min = String(dataHora.getMinutes()).padStart(2,'0');
+    const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
+
+    html2pdf().set({
+        margin: [20, 20, 148, 20], /* top, left, bottom, right em mm; bottom ajustado para metade da página */
+        filename: nomeArquivo,
+        image: { type:'jpeg', quality:0.98 },
+        html2canvas:{ scale: 2, useCORS: true },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
+    }).from(reciboDiv).save().then(()=>{
+        backup.forEach(b=>{
+            b.parent.insertBefore(b.el, b.next);
+        });
+    });
+});
 </script>
+
 </body>
 </html>
