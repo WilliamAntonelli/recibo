@@ -1,1 +1,213 @@
-<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <title>Recibo Editável - Sabor da Roça</title> <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script> <style> body { font-family: Arial, sans-serif; margin: 20px auto; width: 50%; background-color: #fff; } .recibo { border: 1px solid #333; padding: 20px; line-height: 1.5; } h1 { text-align: center; font-size: 1.5em; margin-bottom: 5px; } p { margin: 5px 0; font-size: 1em; } input { border: none; border-bottom: 1px solid #000; font-size: 1em; padding: 2px 3px; font-family: Arial, sans-serif; width: auto; } .linha-editavel input { width: 90%; } .data-container { display: flex; gap: 5px; align-items: center; margin-top:5px; } .assinatura-nome { margin-top:10px; font-weight:bold; } </style> </head> <body> <div class="recibo"> <h1>Sabor da Roça</h1> <p>CNPJ: 58.81.685/0001-82</p> <p>&nbsp;</p> <p>&nbsp;</p> <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ <input type="number" id="valor" placeholder="0,00" min="0"></p> <p id="valorExtenso" style="margin-left:10px;">( )</p> <p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p> <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p> <p>&nbsp;</p> <p>&nbsp;</p> <p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p> <p>&nbsp;</p> <p>&nbsp;</p> <div class="data-container"> Urubici, <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;"> <select id="mes"> <option value="janeiro">Janeiro</option> <option value="fevereiro">Fevereiro</option> <option value="março">Março</option> <option value="abril">Abril</option> <option value="maio">Maio</option> <option value="junho">Junho</option> <option value="julho">Julho</option> <option value="agosto">Agosto</option> <option value="setembro">Setembro</option> <option value="outubro">Outubro</option> <option value="novembro">Novembro</option> <option value="dezembro">Dezembro</option> </select> <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;"> </div> <p class="assinatura-nome">Flavia Aparecida de Souza</p> </div> <div style="text-align:center; margin-top:10px;"> <button id="btnPDF">📄 Gerar PDF</button> </div> <script> // Função para converter número em extenso (até milhões) function numeroParaExtenso(valor){ const numeros = { unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"], especiais: ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"], dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"], centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"] }; valor = parseInt(valor); if(isNaN(valor)) return ""; if(valor === 0) return "zero"; if(valor === 100) return "cem"; let extenso = ""; if(valor >= 1000){ let milhares = Math.floor(valor/1000); extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil"); valor %= 1000; if(valor>0) extenso += " e "; } if(valor >= 100){ let c = Math.floor(valor/100); extenso += numeros.centenas[c]; valor %= 100; if(valor>0) extenso += " e "; } if(valor >= 20){ let d = Math.floor(valor/10); extenso += numeros.dezenas[d]; valor %= 10; if(valor>0) extenso += " e "; } if(valor >=10 && valor <20){ extenso += numeros.especiais[valor-10]; valor=0; } if(valor>0 && valor<10){ extenso += numeros.unidades[valor]; } return extenso; } // Atualiza valor por extenso automaticamente document.getElementById("valor").addEventListener("input", function(){ const valor = this.value; document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )"; }); // Coloca data atual const hoje = new Date(); document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0'); document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'}); document.getElementById("ano").value = hoje.getFullYear(); // Gerar PDF document.getElementById("btnPDF").addEventListener("click", function(){ const reciboDiv = document.querySelector(".recibo"); // Substitui inputs temporariamente por spans const inputs = reciboDiv.querySelectorAll("input, select"); const backup = []; inputs.forEach(el=>{ const span = document.createElement("span"); span.textContent = el.value || el.placeholder; backup.push({parent: el.parentNode, el: el, next: el.nextSibling}); el.parentNode.replaceChild(span, el); }); // Cria nome do arquivo com data e hora const dataHora = new Date(); const ano = dataHora.getFullYear(); const mes = String(dataHora.getMonth()+1).padStart(2,'0'); const dia = String(dataHora.getDate()).padStart(2,'0'); const hora = String(dataHora.getHours()).padStart(2,'0'); const min = String(dataHora.getMinutes()).padStart(2,'0'); const nomeArquivo = recibo_${ano}${mes}${dia}_${hora}${min}.pdf; html2pdf(reciboDiv, { margin: 0.5, filename: nomeArquivo, image: { type:'jpeg', quality:0.98 }, html2canvas:{scale:2}, jsPDF:{unit:'in', format:'a4', orientation:'portrait'} }).then(()=>{ // Restaura inputs backup.forEach(b=>{ b.parent.insertBefore(b.el, b.next); }); }); }); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Recibo Editável - Sabor da Roça</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px auto;
+        background-color: #fff;
+        display: flex;
+        justify-content: center;
+    }
+    .recibo {
+        border: 1px solid #333;
+        padding: 20px;
+        line-height: 1.5;
+        background: white;
+        width: 800px;          /* largura fixa para evitar corte */
+        min-height: 1120px;    /* altura próxima de uma folha A4 */
+        box-sizing: border-box;
+    }
+    h1 {
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: 5px;
+    }
+    p {
+        margin: 5px 0;
+        font-size: 1em;
+    }
+    input {
+        border: none;
+        border-bottom: 1px solid #000;
+        font-size: 1em;
+        padding: 2px 3px;
+        font-family: Arial, sans-serif;
+        width: auto;
+    }
+    .linha-editavel input {
+        width: 90%;
+    }
+    .data-container {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        margin-top:5px;
+    }
+    .assinatura-nome {
+        margin-top:10px;
+        font-weight:bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="recibo" id="recibo">
+<h1>Sabor da Roça</h1>
+<p>CNPJ: 58.81.685/0001-82</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+<input type="number" id="valor" placeholder="0,00" min="0"></p>
+
+<p id="valorExtenso" style="margin-left:10px;">( )</p>
+
+<p>Da <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+<p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+
+<p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<div class="data-container">
+    Urubici, 
+    <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
+    <select id="mes">
+        <option value="janeiro">Janeiro</option>
+        <option value="fevereiro">Fevereiro</option>
+        <option value="março">Março</option>
+        <option value="abril">Abril</option>
+        <option value="maio">Maio</option>
+        <option value="junho">Junho</option>
+        <option value="julho">Julho</option>
+        <option value="agosto">Agosto</option>
+        <option value="setembro">Setembro</option>
+        <option value="outubro">Outubro</option>
+        <option value="novembro">Novembro</option>
+        <option value="dezembro">Dezembro</option>
+    </select>
+    <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
+</div>
+
+<p class="assinatura-nome">Flavia Aparecida de Souza</p>
+
+</div>
+
+<div style="text-align:center; margin-top:10px;">
+<button id="btnPDF">📄 Gerar PDF</button>
+</div>
+
+<script>
+// Função para converter número em extenso (até milhões)
+function numeroParaExtenso(valor){
+    const numeros = {
+        unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
+        especiais: ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"],
+        dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
+        centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
+    };
+
+    valor = parseInt(valor);
+    if(isNaN(valor)) return "";
+
+    if(valor === 0) return "zero";
+    if(valor === 100) return "cem";
+
+    let extenso = "";
+
+    if(valor >= 1000){
+        let milhares = Math.floor(valor/1000);
+        extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
+        valor %= 1000;
+        if(valor>0) extenso += " e ";
+    }
+
+    if(valor >= 100){
+        let c = Math.floor(valor/100);
+        extenso += numeros.centenas[c];
+        valor %= 100;
+        if(valor>0) extenso += " e ";
+    }
+
+    if(valor >= 20){
+        let d = Math.floor(valor/10);
+        extenso += numeros.dezenas[d];
+        valor %= 10;
+        if(valor>0) extenso += " e ";
+    }
+
+    if(valor >=10 && valor <20){
+        extenso += numeros.especiais[valor-10];
+        valor=0;
+    }
+
+    if(valor>0 && valor<10){
+        extenso += numeros.unidades[valor];
+    }
+
+    return extenso;
+}
+
+// Atualiza valor por extenso automaticamente
+document.getElementById("valor").addEventListener("input", function(){
+    const valor = this.value;
+    document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
+});
+
+// Coloca data atual
+const hoje = new Date();
+document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
+document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
+document.getElementById("ano").value = hoje.getFullYear();
+
+// Gerar PDF
+document.getElementById("btnPDF").addEventListener("click", function(){
+    const reciboDiv = document.getElementById("recibo");
+
+    // Substitui inputs temporariamente por spans
+    const inputs = reciboDiv.querySelectorAll("input, select");
+    const backup = [];
+    inputs.forEach(el=>{
+        const span = document.createElement("span");
+        span.textContent = el.value || el.placeholder;
+        backup.push({parent: el.parentNode, el: el, next: el.nextSibling});
+        el.parentNode.replaceChild(span, el);
+    });
+
+    // Cria nome do arquivo com data e hora
+    const dataHora = new Date();
+    const ano = dataHora.getFullYear();
+    const mes = String(dataHora.getMonth()+1).padStart(2,'0');
+    const dia = String(dataHora.getDate()).padStart(2,'0');
+    const hora = String(dataHora.getHours()).padStart(2,'0');
+    const min = String(dataHora.getMinutes()).padStart(2,'0');
+    const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
+
+    html2pdf().set({
+        margin: 0,
+        filename: nomeArquivo,
+        image: { type:'jpeg', quality:0.98 },
+        html2canvas:{ scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
+    }).from(reciboDiv).save().then(()=>{
+        // Restaura inputs
+        backup.forEach(b=>{
+            b.parent.insertBefore(b.el, b.next);
+        });
+    });
+});
+</script>
+
+</body>
+</html>
