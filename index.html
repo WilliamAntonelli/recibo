@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -18,7 +17,6 @@
     .recibo {
         border: 1px solid #333;
         padding-top: 2cm;    
-        padding-bottom: 2cm; 
         padding-left: 2cm;   
         padding-right: 2cm;
         line-height: 1.5;
@@ -28,6 +26,7 @@
         min-height: 297mm;    
         box-sizing: border-box;
         margin-bottom: 20px;
+        position: relative;
     }
     h1 {
         text-align: center;
@@ -46,93 +45,66 @@
         font-family: Arial, sans-serif;
         width: auto;
     }
-    .linha-editavel input {
-        width: 90%;
-    }
-    .espaco-1linha {
-        margin-top: 1em; 
-    }
-    .espaco-2linhas {
-        margin-top: 2em; 
-    }
-    .espaco-3linhas {
-        margin-top: 3em; 
-    }
-    .data-container {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        margin-top: 2em;
-    }
-    .assinatura-nome {
-        font-weight: bold;
-        margin-top: 1em; /* apenas 1 linha até a margem */
+    .assinatura {
+        margin-top: 3em; /* espaço fixo até assinatura */
         text-align: left;
     }
-    #btnPDF {
-        padding: 8px 16px;
-        font-size: 1em;
-        cursor: pointer;
-        margin-top: 10px;
+    .assinatura p {
+        margin: 0.3em 0;
+    }
+    .rodape {
+        position: absolute;
+        bottom: 2cm; /* garante espaço fixo da margem inferior */
+        left: 2cm;
+        right: 2cm;
     }
 </style>
 </head>
 <body>
+    <div class="recibo" id="recibo">
+        <h1>RECIBO</h1>
+        <p>Recebi de <input type="text" placeholder="Nome do cliente">, CPF <input type="text" placeholder="CPF">, a quantia de R$ <input type="text" placeholder="Valor">, referente a <input type="text" placeholder="Motivo">.</p>
+        
+        <br><br> <!-- +2 linhas entre CNPJ e Flavia -->
+        <p>CNPJ: 00.000.000/0000-00</p>
+        <br><br> 
+        <p>Eu, Flavia..., responsável pelo Sabor da Roça, declaro que recebi o valor acima descrito.</p>
+        
+        <br><br> <!-- +2 linhas entre Motivo e Por ser verdade -->
+        <p>Por ser verdade, firmo o presente recibo.</p>
 
-<div class="recibo" id="recibo">
-<h1>Sabor da Roça</h1>
+        <br><br> <!-- +2 linhas entre Por ser verdade e Urubici -->
+        <p>Urubici, ____/____/______</p>
 
-<p>CNPJ: 58.81.685/0001-82</p>
+        <div class="assinatura">
+            <p>___________________________________</p>
+            <p>Flavia...</p>
+        </div>
 
-<p class="espaco-2linhas">Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
-<input type="number" id="valor" placeholder="0,00" min="0"></p>
+        <div class="rodape">
+            <p style="text-align: left; font-size: 0.8em;">
+                Arquivo gerado em: <span id="dataHora"></span>
+            </p>
+        </div>
+    </div>
 
-<p id="valorExtenso" style="margin-left:10px;">( )</p>
-
-<p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
-
-<p class="espaco-2linhas">Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
-
-<p class="espaco-2linhas">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
-
-<div class="data-container espaco-2linhas">
-    Urubici, 
-    <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
-    <select id="mes">
-        <option value="janeiro">Janeiro</option>
-        <option value="fevereiro">Fevereiro</option>
-        <option value="março">Março</option>
-        <option value="abril">Abril</option>
-        <option value="maio">Maio</option>
-        <option value="junho">Junho</option>
-        <option value="julho">Julho</option>
-        <option value="agosto">Agosto</option>
-        <option value="setembro">Setembro</option>
-        <option value="outubro">Outubro</option>
-        <option value="novembro">Novembro</option>
-        <option value="dezembro">Dezembro</option>
-    </select>
-    de <input type="number" id="ano" placeholder="AAAA" style="width:70px;">
-</div>
-
-<p class="assinatura-nome">Flavia Aparecida de Souza</p>
-</div>
-
-<button id="btnPDF">Gerar PDF</button>
+    <button onclick="gerarPDF()">Gerar PDF</button>
 
 <script>
-document.getElementById("btnPDF").addEventListener("click", () => {
-    const recibo = document.getElementById("recibo");
+function gerarPDF() {
+    const element = document.getElementById('recibo');
     const opt = {
         margin: 0,
-        filename: "recibo.pdf",
-        image: { type: "jpeg", quality: 0.98 },
+        filename: new Date().toLocaleString().replace(/[\/, :]/g, '-') + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().from(recibo).set(opt).save();
-});
-</script>
+    html2pdf().set(opt).from(element).save();
+}
 
+// mostrar data/hora no rodapé
+document.getElementById("dataHora").textContent = new Date().toLocaleString();
+</script>
 </body>
 </html>
