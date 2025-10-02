@@ -17,15 +17,15 @@
     }
     .recibo {
         border: 1px solid #333;
-        padding-top: 2cm;    /* topo: 2cm */
-        padding-bottom: 2cm; /* baixo: 2cm */
-        padding-left: 2cm;   /* laterais: 2cm */
+        padding-top: 2cm;    
+        padding-bottom: 2cm; 
+        padding-left: 2cm;   
         padding-right: 2cm;
         line-height: 1.5;
         background: white;
         width: 100%;
-        max-width: 210mm;     /* A4 */
-        min-height: 297mm;    /* A4 */
+        max-width: 210mm;     
+        min-height: 297mm;    
         box-sizing: border-box;
         margin-bottom: 20px;
     }
@@ -49,6 +49,12 @@
     .linha-editavel input {
         width: 90%;
     }
+    .espaco-1linha {
+        margin-top: 1em; 
+    }
+    .espaco-3linhas {
+        margin-top: 3em; 
+    }
     .data-container {
         display: flex;
         gap: 5px;
@@ -57,7 +63,8 @@
     }
     .assinatura-nome {
         font-weight: bold;
-        margin-top: 0;
+        margin-top: 3em; /* apenas 3 linhas até a margem */
+        text-align: left;
     }
     #btnPDF {
         padding: 8px 16px;
@@ -74,7 +81,7 @@
 
 <p>CNPJ: 58.81.685/0001-82</p>
 
-<p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+<p class="espaco-1linha">Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
 <input type="number" id="valor" placeholder="0,00" min="0"></p>
 
 <p id="valorExtenso" style="margin-left:10px;">( )</p>
@@ -83,9 +90,9 @@
 
 <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-<p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+<p class="espaco-1linha">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
 
-<div class="data-container">
+<div class="data-container espaco-1linha">
     Urubici, 
     <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
     <select id="mes">
@@ -102,111 +109,25 @@
         <option value="novembro">Novembro</option>
         <option value="dezembro">Dezembro</option>
     </select>
-    <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
+    de <input type="number" id="ano" placeholder="AAAA" style="width:70px;">
 </div>
 
 <p class="assinatura-nome">Flavia Aparecida de Souza</p>
-
 </div>
 
-<div style="text-align:center;">
-<button id="btnPDF">📄 Gerar PDF</button>
-</div>
+<button id="btnPDF">Gerar PDF</button>
 
 <script>
-// Função para converter número em extenso
-function numeroParaExtenso(valor){
-    const numeros = {
-        unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
-        especiais: ["dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove"],
-        dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
-        centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
+document.getElementById("btnPDF").addEventListener("click", () => {
+    const recibo = document.getElementById("recibo");
+    const opt = {
+        margin: 0,
+        filename: "recibo.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     };
-
-    valor = parseInt(valor);
-    if(isNaN(valor)) return "";
-    if(valor === 0) return "zero";
-    if(valor === 100) return "cem";
-
-    let extenso = "";
-
-    if(valor >= 1000){
-        let milhares = Math.floor(valor/1000);
-        extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
-        valor %= 1000;
-        if(valor>0) extenso += " e ";
-    }
-
-    if(valor >= 100){
-        let c = Math.floor(valor/100);
-        extenso += numeros.centenas[c];
-        valor %= 100;
-        if(valor>0) extenso += " e ";
-    }
-
-    if(valor >= 20){
-        let d = Math.floor(valor/10);
-        extenso += numeros.dezenas[d];
-        valor %= 10;
-        if(valor>0) extenso += " e ";
-    }
-
-    if(valor >=10 && valor <20){
-        extenso += numeros.especiais[valor-10];
-        valor=0;
-    }
-
-    if(valor>0 && valor<10){
-        extenso += numeros.unidades[valor];
-    }
-
-    return extenso;
-}
-
-// Atualiza valor por extenso automaticamente
-document.getElementById("valor").addEventListener("input", function(){
-    const valor = this.value;
-    document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
-});
-
-// Coloca data atual
-const hoje = new Date();
-document.getElementById("dia").value = String(hoje.getDate()).padStart(2,'0');
-document.getElementById("mes").value = hoje.toLocaleString('pt-BR',{month:'long'});
-document.getElementById("ano").value = hoje.getFullYear();
-
-// Gerar PDF
-document.getElementById("btnPDF").addEventListener("click", function(){
-    const reciboDiv = document.getElementById("recibo");
-
-    const inputs = reciboDiv.querySelectorAll("input, select");
-    const backup = [];
-    inputs.forEach(el=>{
-        const span = document.createElement("span");
-        span.textContent = el.value || el.placeholder;
-        backup.push({parent: el.parentNode, el: el, next: el.nextSibling});
-        el.parentNode.replaceChild(span, el);
-    });
-
-    const dataHora = new Date();
-    const ano = dataHora.getFullYear();
-    const mes = String(dataHora.getMonth()+1).padStart(2,'0');
-    const dia = String(dataHora.getDate()).padStart(2,'0');
-    const hora = String(dataHora.getHours()).padStart(2,'0');
-    const min = String(dataHora.getMinutes()).padStart(2,'0');
-    const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
-
-    html2pdf().set({
-        margin: [20, 20, 20, 20], /* 20mm = 2cm em todos os lados */
-        filename: nomeArquivo,
-        image: { type:'jpeg', quality:0.98 },
-        html2canvas:{ scale: 2, useCORS: true },
-        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
-    }).from(reciboDiv).save().then(()=>{
-        backup.forEach(b=>{
-            b.parent.insertBefore(b.el, b.next);
-        });
-    });
+    html2pdf().from(recibo).set(opt).save();
 });
 </script>
 
