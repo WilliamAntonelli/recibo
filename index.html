@@ -8,20 +8,20 @@
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        padding: 20px;
-        background-color: #f5f5f5;
+        background-color: #fff;
         display: flex;
+        justify-content: center;
         flex-direction: column;
         align-items: center;
+        padding: 10px; /* margem da tela */
     }
     .recibo {
         border: 1px solid #333;
-        padding: 2cm; /* margem interna de 2cm */
+        padding: 2cm; /* padding interno de 2cm */
         line-height: 1.5;
         background: white;
         width: 100%;
-        max-width: 800px;
-        min-height: 29.7cm; /* altura A4 para PDF */
+        max-width: 800px; /* limita a largura em telas grandes */
         box-sizing: border-box;
     }
     h1 {
@@ -33,47 +33,45 @@
         margin: 5px 0;
         font-size: 1em;
     }
-    input, select {
+    input {
         border: none;
         border-bottom: 1px solid #000;
         font-size: 1em;
         padding: 2px 3px;
         font-family: Arial, sans-serif;
         width: auto;
-    }
-    .linha-editavel input {
-        width: 90%;
+        max-width: 100%;
     }
     .data-container {
         display: flex;
         gap: 5px;
         align-items: center;
         margin-top: 5px;
-        flex-wrap: wrap;
     }
     .assinatura-nome {
-        margin-top: 1em; /* 2 linhas de espaço */
+        margin-top: 3em; /* cerca de 3 linhas de espaço */
         font-weight: bold;
-        margin-bottom: 1em; /* 2 linhas de espaço */
+        margin-bottom: 1em;
     }
     #btnPDF {
         padding: 8px 16px;
         font-size: 1em;
         cursor: pointer;
         margin-top: 10px;
+        text-align: center;
     }
-    /* Responsividade */
-    @media (max-width: 600px) {
+    /* Ajustes para telas pequenas */
+    @media (max-width: 500px) {
         .recibo {
-            padding: 1.5cm;
-        }
-        input, select {
-            width: 100%;
-            margin-bottom: 5px;
+            padding: 1.5cm; /* reduz padding em celulares */
         }
         .data-container {
             flex-direction: column;
             align-items: flex-start;
+            gap: 3px;
+        }
+        .data-container input, .data-container select {
+            width: 100%;
         }
     }
 </style>
@@ -85,12 +83,11 @@
     <p>CNPJ: 58.81.685/0001-82</p>
 
     <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
-        <input type="number" id="valor" placeholder="0,00" min="0">
-    </p>
+    <input type="number" id="valor" placeholder="0,00" min="0"></p>
 
-    <p id="valorExtenso">( )</p>
+    <p id="valorExtenso" style="margin-left:10px;">( )</p>
 
-    <p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+    <p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
     <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
@@ -98,7 +95,7 @@
 
     <div class="data-container">
         Urubici, 
-        <input type="number" id="dia" placeholder="DD" min="1" max="31">
+        <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
         <select id="mes">
             <option value="janeiro">Janeiro</option>
             <option value="fevereiro">Fevereiro</option>
@@ -113,7 +110,7 @@
             <option value="novembro">Novembro</option>
             <option value="dezembro">Dezembro</option>
         </select>
-        <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100">
+        <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
     </div>
 
     <p class="assinatura-nome">Flavia Aparecida de Souza</p>
@@ -124,7 +121,7 @@
 </div>
 
 <script>
-// Converter número em extenso
+// Função para converter número em extenso (até milhões)
 function numeroParaExtenso(valor){
     const numeros = {
         unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
@@ -132,40 +129,49 @@ function numeroParaExtenso(valor){
         dezenas: ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"],
         centenas: ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"]
     };
+
     valor = parseInt(valor);
     if(isNaN(valor)) return "";
+
     if(valor === 0) return "zero";
     if(valor === 100) return "cem";
+
     let extenso = "";
+
     if(valor >= 1000){
         let milhares = Math.floor(valor/1000);
         extenso += (milhares > 1 ? numeroParaExtenso(milhares) + " mil" : "mil");
         valor %= 1000;
         if(valor>0) extenso += " e ";
     }
+
     if(valor >= 100){
         let c = Math.floor(valor/100);
         extenso += numeros.centenas[c];
         valor %= 100;
         if(valor>0) extenso += " e ";
     }
+
     if(valor >= 20){
         let d = Math.floor(valor/10);
         extenso += numeros.dezenas[d];
         valor %= 10;
         if(valor>0) extenso += " e ";
     }
+
     if(valor >=10 && valor <20){
         extenso += numeros.especiais[valor-10];
         valor=0;
     }
+
     if(valor>0 && valor<10){
         extenso += numeros.unidades[valor];
     }
+
     return extenso;
 }
 
-// Atualiza valor por extenso
+// Atualiza valor por extenso automaticamente
 document.getElementById("valor").addEventListener("input", function(){
     const valor = this.value;
     document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
@@ -181,6 +187,7 @@ document.getElementById("ano").value = hoje.getFullYear();
 document.getElementById("btnPDF").addEventListener("click", function(){
     const reciboDiv = document.getElementById("recibo");
 
+    // Substitui inputs temporariamente por spans
     const inputs = reciboDiv.querySelectorAll("input, select");
     const backup = [];
     inputs.forEach(el=>{
@@ -190,6 +197,7 @@ document.getElementById("btnPDF").addEventListener("click", function(){
         el.parentNode.replaceChild(span, el);
     });
 
+    // Cria nome do arquivo com data e hora
     const dataHora = new Date();
     const ano = dataHora.getFullYear();
     const mes = String(dataHora.getMonth()+1).padStart(2,'0');
@@ -199,12 +207,13 @@ document.getElementById("btnPDF").addEventListener("click", function(){
     const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
 
     html2pdf().set({
-        margin: 20, // 2cm
+        margin: 2, // 2cm no PDF
         filename: nomeArquivo,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{ scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
+        jsPDF:{ unit:'cm', format:'a4', orientation:'portrait' }
     }).from(reciboDiv).save().then(()=>{
+        // Restaura inputs
         backup.forEach(b=>{
             b.parent.insertBefore(b.el, b.next);
         });
