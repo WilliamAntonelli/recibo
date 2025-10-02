@@ -19,9 +19,8 @@
         padding: 20px;
         line-height: 1.5;
         background: white;
-        width: 800px;          /* largura fixa para evitar corte */
-        min-height: 1120px;    /* altura próxima de uma folha A4 */
-        width: 800px;   /* largura fixa para consistência */
+        width: 800px;
+        min-height: 1120px; /* altura próxima de A4 */
         box-sizing: border-box;
         margin-bottom: 30px; /* espaço para o botão */
     }
@@ -49,15 +48,12 @@
         display: flex;
         gap: 5px;
         align-items: center;
-        margin-top:5px;
         margin-top: 5px;
     }
     .assinatura-nome {
-        margin-top:10px;
-        font-weight:bold;
         margin-top: 10px;
         font-weight: bold;
-        margin-bottom: 40px; /* 3 a 4 linhas de espaço */
+        margin-bottom: 20px; /* dois espaços */
     }
     #btnPDF {
         padding: 8px 16px;
@@ -69,60 +65,59 @@
 <body>
 
 <div class="recibo" id="recibo">
-<h1>Sabor da Roça</h1>
-<p>CNPJ: 58.81.685/0001-82</p>
+    <h1>Sabor da Roça</h1>
+    <p>CNPJ: 58.81.685/0001-82</p>
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 
-<p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
-<input type="number" id="valor" placeholder="0,00" min="0"></p>
+    <p>Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+        <input type="number" id="valor" placeholder="0,00" min="0">
+    </p>
 
-<p id="valorExtenso" style="margin-left:10px;">( )</p>
+    <p id="valorExtenso" style="margin-left:10px;">( )</p>
 
-<p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
-<p>Da <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
+    <p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
-<p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
+    <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 
-<p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+    <p>Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 
-<div class="data-container">
-    Urubici, 
-    <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
-    <select id="mes">
-        <option value="janeiro">Janeiro</option>
-        <option value="fevereiro">Fevereiro</option>
-        <option value="março">Março</option>
-        <option value="abril">Abril</option>
-        <option value="maio">Maio</option>
-        <option value="junho">Junho</option>
-        <option value="julho">Julho</option>
-        <option value="agosto">Agosto</option>
-        <option value="setembro">Setembro</option>
-        <option value="outubro">Outubro</option>
-        <option value="novembro">Novembro</option>
-        <option value="dezembro">Dezembro</option>
-    </select>
-    <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
-</div>
+    <div class="data-container">
+        Urubici, 
+        <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
+        <select id="mes">
+            <option value="janeiro">Janeiro</option>
+            <option value="fevereiro">Fevereiro</option>
+            <option value="março">Março</option>
+            <option value="abril">Abril</option>
+            <option value="maio">Maio</option>
+            <option value="junho">Junho</option>
+            <option value="julho">Julho</option>
+            <option value="agosto">Agosto</option>
+            <option value="setembro">Setembro</option>
+            <option value="outubro">Outubro</option>
+            <option value="novembro">Novembro</option>
+            <option value="dezembro">Dezembro</option>
+        </select>
+        <input type="number" id="ano" placeholder="AAAA" min="2000" max="2100" style="width:80px;">
+    </div>
 
-<p class="assinatura-nome">Flavia Aparecida de Souza</p>
-
+    <p class="assinatura-nome">Flavia Aparecida de Souza</p>
 </div>
 
 <div style="text-align:center; margin-top:10px;">
-<button id="btnPDF">📄 Gerar PDF</button>
+    <button id="btnPDF">📄 Gerar PDF</button>
 </div>
 
 <script>
-// Função para converter número em extenso (até milhões)
+// Função para converter número em extenso
 function numeroParaExtenso(valor){
     const numeros = {
         unidades: ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"],
@@ -133,7 +128,6 @@ function numeroParaExtenso(valor){
 
     valor = parseInt(valor);
     if(isNaN(valor)) return "";
-
     if(valor === 0) return "zero";
     if(valor === 100) return "cem";
 
@@ -145,34 +139,29 @@ function numeroParaExtenso(valor){
         valor %= 1000;
         if(valor>0) extenso += " e ";
     }
-
     if(valor >= 100){
         let c = Math.floor(valor/100);
         extenso += numeros.centenas[c];
         valor %= 100;
         if(valor>0) extenso += " e ";
     }
-
     if(valor >= 20){
         let d = Math.floor(valor/10);
         extenso += numeros.dezenas[d];
         valor %= 10;
         if(valor>0) extenso += " e ";
     }
-
     if(valor >=10 && valor <20){
         extenso += numeros.especiais[valor-10];
         valor=0;
     }
-
     if(valor>0 && valor<10){
         extenso += numeros.unidades[valor];
     }
-
     return extenso;
 }
 
-// Atualiza valor por extenso automaticamente
+// Atualiza valor por extenso
 document.getElementById("valor").addEventListener("input", function(){
     const valor = this.value;
     document.getElementById("valorExtenso").innerText = "( " + numeroParaExtenso(valor) + " reais )";
@@ -198,7 +187,7 @@ document.getElementById("btnPDF").addEventListener("click", function(){
         el.parentNode.replaceChild(span, el);
     });
 
-    // Cria nome do arquivo com data e hora
+    // Nome do arquivo
     const dataHora = new Date();
     const ano = dataHora.getFullYear();
     const mes = String(dataHora.getMonth()+1).padStart(2,'0');
