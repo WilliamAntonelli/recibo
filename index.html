@@ -52,6 +52,9 @@
     .espaco-1linha {
         margin-top: 1em; 
     }
+    .espaco-2linhas {
+        margin-top: 2em; 
+    }
     .espaco-3linhas {
         margin-top: 3em; 
     }
@@ -59,11 +62,11 @@
         display: flex;
         gap: 5px;
         align-items: center;
-        margin-top: 1em;
+        margin-top: 2em;
     }
     .assinatura-nome {
         font-weight: bold;
-        margin-top: 3em; /* apenas 3 linhas até a margem */
+        margin-top: 1em; /* apenas 1 linha até a margem */
         text-align: left;
     }
     #btnPDF {
@@ -81,18 +84,18 @@
 
 <p>CNPJ: 58.81.685/0001-82</p>
 
-<p class="espaco-1linha">Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
+<p class="espaco-2linhas">Eu, Flavia Aparecida de Souza, recebi a quantia de R$ 
 <input type="number" id="valor" placeholder="0,00" min="0"></p>
 
 <p id="valorExtenso" style="margin-left:10px;">( )</p>
 
 <p>De: <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
-<p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
+<p class="espaco-2linhas">Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
-<p class="espaco-1linha">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
+<p class="espaco-2linhas">Por ser verdade, firmamos o presente recibo para os devidos fins.</p>
 
-<div class="data-container espaco-1linha">
+<div class="data-container espaco-2linhas">
     Urubici, 
     <input type="number" id="dia" placeholder="DD" min="1" max="31" style="width:50px;">
     <select id="mes">
