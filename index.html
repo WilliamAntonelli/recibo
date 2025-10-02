@@ -19,11 +19,10 @@
         padding: 20px;
         line-height: 1.5;
         background: white;
-        width: 800px;          /* largura fixa para evitar corte */
-        min-height: 1120px;    /* altura próxima de uma folha A4 */
-        width: 800px;   /* largura fixa para consistência */
+        width: 800px;
+        min-height: 900px; /* margem inferior reduzida */
         box-sizing: border-box;
-        margin-bottom: 30px; /* espaço para o botão */
+        margin-bottom: 30px;
     }
     h1 {
         text-align: center;
@@ -50,14 +49,11 @@
         gap: 5px;
         align-items: center;
         margin-top:5px;
-        margin-top: 5px;
     }
     .assinatura-nome {
         margin-top:10px;
         font-weight:bold;
-        margin-top: 10px;
-        font-weight: bold;
-        margin-bottom: 40px; /* 3 a 4 linhas de espaço */
+        margin-bottom: 40px;
     }
     #btnPDF {
         padding: 8px 16px;
@@ -80,8 +76,8 @@
 
 <p id="valorExtenso" style="margin-left:10px;">( )</p>
 
+<!-- Linha "De:" mantida, linha "Da:" removida -->
 <p>De <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
-<p>Da <input type="text" id="pagador" placeholder="Nome do pagador" style="width:100%;"></p>
 
 <p>Referente à <input type="text" id="motivo" placeholder="Motivo" style="width:100%;"></p>
 
