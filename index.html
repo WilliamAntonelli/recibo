@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -16,15 +17,15 @@
     }
     .recibo {
         border: 1px solid #333;
-        padding-top: 2cm;    /* topo: 2cm (~3 linhas) */
-        padding-bottom: 2cm; /* baixo: ~3 linhas */
-        padding-left: 4cm;   /* laterais: 4cm */
-        padding-right: 4cm;
+        padding-top: 2cm;    /* topo: 2cm */
+        padding-bottom: 2cm; /* baixo: 2cm */
+        padding-left: 2cm;   /* laterais: 2cm */
+        padding-right: 2cm;
         line-height: 1.5;
         background: white;
-        width: 100%;          /* largura máxima da folha */
-        max-width: 210mm;     /* tamanho A4 */
-        min-height: 297mm;    /* altura A4 */
+        width: 100%;
+        max-width: 210mm;     /* A4 */
+        min-height: 297mm;    /* A4 */
         box-sizing: border-box;
         margin-bottom: 20px;
     }
@@ -52,11 +53,11 @@
         display: flex;
         gap: 5px;
         align-items: center;
-        margin-top: 1em; /* 1 linha antes de Urubici */
+        margin-top: 1em;
     }
     .assinatura-nome {
         font-weight: bold;
-        margin-top: 0; /* assinatura colada em Urubici */
+        margin-top: 0;
     }
     #btnPDF {
         padding: 8px 16px;
@@ -196,7 +197,7 @@ document.getElementById("btnPDF").addEventListener("click", function(){
     const nomeArquivo = `recibo_${ano}${mes}${dia}_${hora}${min}.pdf`;
 
     html2pdf().set({
-        margin: [20, 40, 20, 40], /* top, left, bottom, right em mm */
+        margin: [20, 20, 20, 20], /* 20mm = 2cm em todos os lados */
         filename: nomeArquivo,
         image: { type:'jpeg', quality:0.98 },
         html2canvas:{ scale: 2, useCORS: true },
